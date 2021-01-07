@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"regexp"
+	"strings"
 
 	bugsnag "github.com/bugsnag/bugsnag-go/v2"
 )
@@ -62,8 +63,25 @@ func configureBugsnag() error {
 		Logger:              &logger{},
 	}
 
-	endpoint := os.Getenv("BUGSNAG_ENDPOINT")
-	if endpoint != "" {
+	if stage := os.Getenv("BUGSNAG_RELEASE_STAGE"); stage != "" {
+		config.ReleaseStage = stage
+	}
+	if app_version := os.Getenv("BUGSNAG_APP_VERSION"); app_version != "" {
+		config.AppVersion = app_version
+	}
+	if hostname := os.Getenv("BUGSNAG_HOSTNAME"); hostname != "" {
+		config.Hostname = hostname
+	}
+	if sourceRoot := os.Getenv("BUGSNAG_SOURCE_ROOT"); sourceRoot != "" {
+		config.SourceRoot = sourceRoot
+	}
+	if appType := os.Getenv("BUGSNAG_APP_TYPE"); appType != "" {
+		config.AppType = appType
+	}
+	if packages := os.Getenv("BUGSNAG_PROJECT_PACKAGES"); packages != "" {
+		config.ProjectPackages = strings.Split(packages, ",")
+	}
+	if endpoint := os.Getenv("BUGSNAG_ENDPOINT"); endpoint != "" {
 		config.Endpoints = bugsnag.Endpoints{
 			Notify:   endpoint,
 			Sessions: "",

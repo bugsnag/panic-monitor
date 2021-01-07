@@ -1,6 +1,7 @@
 require 'open3'
 
 BUILD_DIR = File.join(Dir.pwd, "build")
+FIXTURE_DIR = File.expand_path(File.join(File.dirname(__FILE__), '..', 'fixtures'))
 PROCESSES = []
 VERBOSE = ENV['VERBOSE'] || ARGV.include?('--verbose')
 GO_VERSION =`go version`.split[2]
@@ -40,4 +41,25 @@ end
 
 def add_to_environment key, value
   @env[key] = value
+end
+
+def read_key_path hash, key_path
+  value = hash
+  key_path.split('.').each do |key|
+    if key =~ /^(\d+)$/
+      key = key.to_i
+      if value.length > key
+        value = value[key.to_i]
+      else
+        return nil
+      end
+    else
+      if value.keys.include? key
+        value = value[key]
+      else
+        return nil
+      end
+    end
+  end
+  value
 end

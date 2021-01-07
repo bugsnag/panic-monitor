@@ -26,7 +26,23 @@ When('I run the monitor with arguments {string}') do |args|
 end
 
 Given('I set the API key to {string}') do |key|
-  add_to_environment("BUGSNAG_API_KEY", key)
+  step("I set \"BUGSNAG_API_KEY\" to \"#{key}\" in the environment")
+end
+
+When('I set {string} to {string} in the environment') do |key, value|
+  add_to_environment(key, value)
+end
+
+When('I set {string} to the sample app directory') do |key|
+  add_to_environment(key, File.join(FIXTURE_DIR, 'app/'))
+end
+
+Then("payload field {string} equals {string}") do |keypath, expected_value|
+  event = @server.events.last
+  expect(event).not_to be_nil
+  actual = JSON.parse(event.body)
+  expect(actual["events"].length).to eq(1)
+  expect(read_key_path(actual["events"][0], keypath)).to eq(expected_value)
 end
 
 Then("1 request was received") do
@@ -75,17 +91,31 @@ Then(/^I receive an error event matching (.*)$/) do |filename|
     expect(actual).to eq(expected)
 
     # Validate in-project components of the stacktrace
-    found = 0 # counts matching frames and ensures ordering is correct
-    expected_len = expected_stack.length
-    actual_stack.each do |frame|
-      if found < expected_len and frame["inProject"] and
-          frame["file"] == expected_stack[found]["file"] and
-          frame["method"] == expected_stack[found]["method"]
-        found = found + 1
-      elsif found >= expected_len and frame["inProject"]
-        found = found + 1 # detect excess frames without false negatives
-      end
-    end
-    expect(found).to eq(expected_len), "expected #{expected_len} matching frames but found #{found}. stacktrace:\n#{actual_stack}"
+    validate_stacktrace(actual_stack, expected_stack)
   end
+end
+
+# Validate in-project components of the stacktrace
+def validate_stacktrace actual_stack, expected_stack
+  found = 0 # counts matching frames and ensures ordering is correct
+  expected_len = expected_stack.length
+  actual_stack.each do |frame|
+    if found < expected_len and frame["inProject"] and
+        frame["file"] == expected_stack[found]["file"] and
+        frame["method"] == expected_stack[found]["method"] and
+        frame["lineNumber"] == expected_stack[found]["lineNumber"].to_i
+      found = found + 1
+    elsif found >= expected_len and frame["inProject"]
+      found = found + 1 # detect excess frames without false negatives
+    end
+  end
+  expect(found).to eq(expected_len), "expected #{expected_len} matching frames but found #{found}. stacktrace:\n#{actual_stack}"
+end
+
+Then('the payload contains the following in-project stack frames:') do |table|
+  event = @server.events.last
+  expect(event).not_to be_nil
+  actual = JSON.parse(event.body)
+  expect(actual["events"].length).to eq(1)
+  validate_stacktrace(actual["events"][0]["exceptions"][0]["stacktrace"], table.hashes)
 end
