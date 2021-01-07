@@ -1,9 +1,5 @@
 Feature: Printing information about what went wrong
 
-    Background:
-        Given I build the executable
-        And I build a sample app
-
     Scenario: Running without an API key set
         When I crash the app using no-op
         Then the monitor process exited with an error

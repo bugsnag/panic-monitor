@@ -1,17 +1,3 @@
-Given("I build the executable") do
-  Dir.chdir(BUILD_DIR) do
-    `go build ..`
-    expect(File.exists? "panic-monitor").to be_truthy
-  end
-end
-
-Given("I build a sample app") do
-  Dir.chdir(BUILD_DIR) do
-    `go build ../features/fixtures/app`
-    expect(File.exists? "app").to be_truthy
-  end
-end
-
 When(/^I crash the app using (.*)$/) do |testcase|
   add_to_environment("TESTCASE", testcase)
   Dir.chdir(BUILD_DIR) do

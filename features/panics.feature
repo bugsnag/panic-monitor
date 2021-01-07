@@ -1,9 +1,7 @@
 Feature: Reporting fatal panics
 
     Background:
-        Given I build the executable
-        And I build a sample app
-        And I set the API key to "035d2472bd130ac0ab0f52715bbdc65d"
+        When I set the API key to "035d2472bd130ac0ab0f52715bbdc65d"
 
     Scenario Outline: Fatal panics from varying causes
         When I crash the app using <case>

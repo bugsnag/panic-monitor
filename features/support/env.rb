@@ -6,8 +6,16 @@ PROCESSES = []
 VERBOSE = ENV['VERBOSE'] || ARGV.include?('--verbose')
 GO_VERSION =`go version`.split[2]
 
+FileUtils.mkdir_p BUILD_DIR
+# Build executables for the tests
+Dir.chdir(BUILD_DIR) do
+  `go build ..`
+  raise "Failed to build monitor" unless File.exists? "panic-monitor"
+  `go build ../features/fixtures/app`
+  raise "Failed to build sample app" unless File.exists? "app"
+end
+
 Before do
-  FileUtils.mkdir_p BUILD_DIR
   PROCESSES.clear
   @server = Webserver.new
   @server.start
