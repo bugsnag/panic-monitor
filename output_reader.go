@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"sync"
 
-	bugsnag "github.com/bugsnag/bugsnag-go/v2"
 	l "github.com/bugsnag/proc-launcher/launcher"
 )
 
@@ -62,19 +61,9 @@ func (reader *outputReader) runProcess(args ...string) error {
 	return nil
 }
 
-func (reader *outputReader) checkAndSendPanicEvent() {
+func (reader *outputReader) detectedPanic() (*uncaughtPanic, error) {
 	if !reader.FoundPanic() {
-		return
+		return nil, fmt.Errorf("No panic detected")
 	}
-	contents := string(reader.buffer.Bytes())
-	value, err := parsePanic(contents)
-	if value != nil {
-		bugsnag.Notify(value, bugsnag.HandledState{
-			SeverityReason:   bugsnag.SeverityReasonUnhandledPanic,
-			OriginalSeverity: bugsnag.SeverityError,
-			Unhandled:        true,
-		}, bugsnag.ErrorClass{Name: value.typeName})
-	} else {
-		fmt.Printf("Could not deliver panic due to error: %v\n", err)
-	}
+	return parsePanic(string(reader.buffer.Bytes()))
 }

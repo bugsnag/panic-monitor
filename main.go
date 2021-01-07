@@ -23,7 +23,16 @@ func main() {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-	reader.checkAndSendPanicEvent()
+
+	event, _ := reader.detectedPanic()
+	if event != nil {
+		bugsnag.Notify(event, bugsnag.HandledState{
+			SeverityReason:   bugsnag.SeverityReasonUnhandledPanic,
+			OriginalSeverity: bugsnag.SeverityError,
+			Unhandled:        true,
+		}, bugsnag.ErrorClass{Name: event.typeName})
+	}
+
 	os.Exit(reader.exitCode)
 }
 
