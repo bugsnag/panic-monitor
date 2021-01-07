@@ -17,11 +17,11 @@ panic-monitor PROGRAM [PROGRAM arguments]
 Build one of the example crashing apps using `go build`:
 
 ```sh
-go build features/fixtures/map-readwrite/main.go
+TESTCASE="explicit panic" go build features/fixtures/app
 ```
 
 Then run it using the monitor:
 
 ```sh
-BUGSNAG_API_KEY="your-api-key-here" ./panic-monitor ./map-readwrite
+BUGSNAG_API_KEY="your-api-key-here" ./panic-monitor ./app
 ```
