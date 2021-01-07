@@ -25,7 +25,7 @@ end
 After do
   PROCESSES.each do |p|
     begin
-      puts p[:stderr].read if VERBOSE
+      Kernel.puts p[:stderr].read if VERBOSE
       Process.kill 'KILL', p[:thread][:pid]
     rescue
     end

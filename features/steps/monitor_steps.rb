@@ -11,6 +11,14 @@ When('I run the monitor with arguments {string}') do |args|
   end
 end
 
+# More robust step to handle when more than split-every-space is needed
+When("I run the monitor with:") do |table|
+  Dir.chdir(BUILD_DIR) do
+    args = table.raw.flatten
+    start_process(["./panic-monitor"] + args)
+  end
+end
+
 Given('I set the API key to {string}') do |key|
   step("I set \"BUGSNAG_API_KEY\" to \"#{key}\" in the environment")
 end
@@ -50,6 +58,13 @@ end
 
 Then("{string} was printed to stderr") do |contents|
   expect(PROCESSES[-1][:stderr].read).to include contents
+end
+
+Then('the following messages were printed to stderr:') do |table|
+  buffer = PROCESSES[-1][:stderr].read
+  table.raw.each do |message|
+    expect(buffer).to include message[0]
+  end
 end
 
 Then(/^I receive an error event matching (.*)$/) do |filename|

@@ -26,7 +26,10 @@ func main() {
 		os.Exit(1)
 	}
 
-	event, _ := reader.detectedPanic()
+	event, detectionErr := reader.detectedPanic()
+	if detectionErr != nil && debugModeEnabled() {
+		printErr("%v", detectionErr)
+	}
 	if event != nil {
 		bugsnag.Notify(event, bugsnag.HandledState{
 			SeverityReason:   bugsnag.SeverityReasonUnhandledPanic,
@@ -36,6 +39,10 @@ func main() {
 	}
 
 	os.Exit(reader.exitCode)
+}
+
+func debugModeEnabled() bool {
+	return os.Getenv("DEBUG") == "1"
 }
 
 func printErr(format string, args ...interface{}) {
@@ -60,7 +67,11 @@ func configureBugsnag() error {
 		PanicHandler:        func() {},
 		Synchronous:         true,
 		AutoCaptureSessions: false,
-		Logger:              &logger{},
+	}
+
+	if !debugModeEnabled() {
+		// mute warnings from underlying bugsnag lib unless in debug mode
+		config.Logger = &logger{}
 	}
 
 	if stage := os.Getenv("BUGSNAG_RELEASE_STAGE"); stage != "" {

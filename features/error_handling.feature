@@ -29,3 +29,23 @@ Feature: Printing information about what went wrong
         And "No program specified" was printed to stderr
         And "Usage: ./panic-monitor EXECUTABLE [EXECUTABLE args]" was printed to stdout
         And 0 requests were received
+
+    Scenario: Debug logging for failed panic detection
+        When I set the API key to "035d2472bd130ac0ab0f52715bbdc65d"
+        When I set "DEBUG" to "1" in the environment
+        And I run the monitor with:
+            | bash | -c | echo "pancake:" >&2 |
+        Then the following messages were printed to stderr:
+            | pancake:          |
+            | No panic detected |
+        And 0 requests were received
+
+    Scenario: Debug logging for invalid panic detection
+        When I set the API key to "035d2472bd130ac0ab0f52715bbdc65d"
+        When I set "DEBUG" to "1" in the environment
+        And I run the monitor with:
+            | bash | -c | echo "panic: foo" >&2 |
+        Then the following messages were printed to stderr:
+            | panic: foo             |
+            | could not parse panic: |
+        And 0 requests were received
