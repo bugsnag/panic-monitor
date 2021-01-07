@@ -1,6 +1,6 @@
 package main
 
-func main() {
+func concurrentReadWrite() {
 	m := map[string]int{}
 
 	go func() {
@@ -11,4 +11,8 @@ func main() {
 	for {
 		_ = m["x"]
 	}
+}
+
+func explicitPanic() {
+	panic("PANIQ!")
 }
