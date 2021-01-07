@@ -25,7 +25,7 @@ After do
 end
 
 at_exit do
-  # FileUtils.rm_r BUILD_DIR
+  FileUtils.rm_r BUILD_DIR
 end
 
 def start_process args
