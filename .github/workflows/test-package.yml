@@ -1,0 +1,54 @@
+name: Test
+
+on: [ push, pull_request ]
+
+jobs:
+  test:
+
+    runs-on: ubuntu-20.04
+    defaults:
+      run:
+        working-directory: 'go/src/github.com/bugsnag/panic-monitor' # relative to $GITHUB_WORKSPACE
+    strategy:
+      fail-fast: false
+      matrix:
+        go-version: ['1.11', '1.12', '1.13', '1.14', '1.15']
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        path: 'go/src/github.com/bugsnag/panic-monitor' # relative to $GITHUB_WORKSPACE
+    - name: set GOPATH
+      run: |
+        echo $GITHUB_WORKSPACE
+        bash -c 'echo "GOPATH=$GITHUB_WORKSPACE/go" >> $GITHUB_ENV'
+    - uses: actions/setup-go@v2
+      with:
+        go-version: ${{ matrix.go-version }}
+    - name: install dependencies
+      run: go get -v -d ./...
+    - name: run unit tests
+      run: go test -v ./...
+    - name: vet package
+      run: go vet ./...
+
+    - name: set up ruby (for integration env)
+      uses: actions/setup-ruby@v1
+      with:
+        ruby-version: '2.6'
+    - name: install bundler
+      run: gem install bundler --quiet --silent
+    - uses: actions/cache@v2
+      with:
+        path: vendor/bundle
+        key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-gems-
+    - name: install integration dependencies
+      run: |
+        bundle config path vendor/bundle
+        bundle install --jobs 4 --retry 3 --quiet
+    - name: run integration tests
+      run: bundle exec cucumber --color
+
+
