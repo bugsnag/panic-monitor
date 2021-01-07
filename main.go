@@ -10,17 +10,18 @@ import (
 
 func main() {
 	if err := configureBugsnag(); err != nil {
-		fmt.Printf("Failed to launch monitor: %v\n", err)
+		printErr("Failed to launch monitor: %v\n", err)
 		printUsage()
 		os.Exit(1)
 	}
 	if len(os.Args) < 2 {
+		printErr("No program specified\n")
 		printUsage()
 		os.Exit(1)
 	}
 	reader := NewOutputReader()
 	if err := reader.runProcess(os.Args[1:]...); err != nil {
-		fmt.Println(err)
+		printErr("Failed to run program: %v\n", err)
 		os.Exit(1)
 	}
 
@@ -36,6 +37,10 @@ func main() {
 	os.Exit(reader.exitCode)
 }
 
+func printErr(format string, args ...interface{}) {
+	os.Stderr.WriteString(fmt.Sprintf(format, args...))
+}
+
 func printUsage() {
 	fmt.Printf("Usage: %s EXECUTABLE [EXECUTABLE args]\n", os.Args[0])
 }
@@ -43,8 +48,10 @@ func printUsage() {
 func configureBugsnag() error {
 	matcher := regexp.MustCompile("^[0-9a-fA-f]{32}$")
 	apiKey := os.Getenv("BUGSNAG_API_KEY")
-	if !matcher.MatchString(apiKey) {
+	if apiKey == "" {
 		return fmt.Errorf("Missing required $BUGSNAG_API_KEY environment variable\n")
+	} else if !matcher.MatchString(apiKey) {
+		return fmt.Errorf("$BUGSNAG_API_KEY must be a 32-character hexadecimal value")
 	}
 
 	config := bugsnag.Configuration{

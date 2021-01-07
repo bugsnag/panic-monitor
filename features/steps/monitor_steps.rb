@@ -19,6 +19,12 @@ When(/^I crash the app using (.*)$/) do |testcase|
   end
 end
 
+When('I run the monitor with arguments {string}') do |args|
+  Dir.chdir(BUILD_DIR) do
+    start_process(["./panic-monitor"] + args.split(' '))
+  end
+end
+
 Given('I set the API key to {string}') do |key|
   add_to_environment("BUGSNAG_API_KEY", key)
 end
@@ -34,6 +40,10 @@ end
 Then("the monitor process exited with an error") do
   status = PROCESSES[-1][:thread].value
   expect(status.exited?).to be_truthy
+end
+
+Then("{string} was printed to stdout") do |contents|
+  expect(PROCESSES[-1][:stdout].read).to include contents
 end
 
 Then("{string} was printed to stderr") do |contents|
