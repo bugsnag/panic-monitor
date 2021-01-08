@@ -62,7 +62,7 @@ func parsePanic(text string) (*uncaughtPanic, error) {
 			}
 
 		} else if state == "parsing" {
-			if line == "" {
+			if line == "" || strings.HasPrefix(line, "...") {
 				state = "done"
 				break
 			}

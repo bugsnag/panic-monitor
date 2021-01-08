@@ -38,6 +38,7 @@ func (reader *outputReader) ReadStderr(contents []byte) {
 			location := bytes.Index(reader.buffer.Bytes(), header)
 			if location != -1 {
 				reader.panicType = index
+				reader.buffer.Next(location)
 				break
 			}
 		}

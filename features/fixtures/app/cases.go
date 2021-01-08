@@ -36,3 +36,11 @@ func fakePanicRealPanic() {
 
 	panic("REAL PANIC!")
 }
+
+func stackExhaustion() {
+	var f func(a [1000]int64)
+	f = func(a [1000]int64) {
+		f(a)
+	}
+	f([1000]int64{})
+}
