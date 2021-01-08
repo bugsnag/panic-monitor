@@ -28,6 +28,27 @@ Override the default values in the monitor through environment variables:
 | BUGSNAG\_RELEASE\_STAGE          | The deployment stage of the application, like "production" or "beta" or "staging" |
 | BUGSNAG\_SOURCE\_ROOT            | The directory where source packages are built and the assumed prefix of package directories |
 
+### Custom metadata
+
+Add metadata through environment variables prefixed with `BUGSNAG_METADATA_`.
+
+The environment variable name after the prefix is expected to be the tab and key name,
+delimited by a period.
+
+Underscores in the the tab and/or key values are replaced with spaces.
+
+Examples:
+
+```sh
+BUGSNAG_METADATA_device.KubePod="carrot-delivery-service-beta1 reg3"
+BUGSNAG_METADATA_device.deployment_area=region5_1
+```
+
+Would add the following metadata to the `device` tab in the event of a panic:
+
+* `KubePod`: `carrot-delivery-service-beta1 reg3`
+* `deployment area`: `region5_1`
+
 ## Examples
 
 Build one of the example crashing apps using `go build`:

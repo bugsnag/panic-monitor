@@ -102,6 +102,20 @@ func configureBugsnag() error {
 		}
 	}
 
+	bugsnag.OnBeforeNotify(func(event *bugsnag.Event, config *bugsnag.Configuration) error {
+		for _, value := range os.Environ() {
+			key, value, err := parseEnvironmentPair(value)
+			if err != nil {
+				continue
+			}
+			if keypath, err := parseMetadataKeypath(key); err == nil {
+				addMetadata(event, keypath, value)
+			}
+		}
+
+		return nil
+	})
+
 	bugsnag.Configure(config)
 	return nil
 }
