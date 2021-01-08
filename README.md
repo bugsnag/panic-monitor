@@ -60,7 +60,7 @@ TESTCASE="explicit panic" go build features/fixtures/app
 Then run it using the monitor:
 
 ```sh
-BUGSNAG_API_KEY="your-api-key-here" ./panic-monitor ./app
+BUGSNAG_API_KEY="your-api-key-here" panic-monitor ./app
 ```
 
 ## Testing

@@ -3,16 +3,18 @@ Feature: Printing information about what went wrong
     Scenario: Running without an API key set
         When I crash the app using no-op
         Then the monitor process exited with an error
-        And "Failed to launch monitor: Missing required $BUGSNAG_API_KEY" was printed to stderr
-        And "Usage: ./panic-monitor EXECUTABLE [EXECUTABLE args]" was printed to stdout
+        Then the following messages were printed to stderr:
+            | Failed to launch monitor: Missing required $BUGSNAG_API_KEY |
+            | Usage: ./panic-monitor EXECUTABLE [EXECUTABLE args]         |
         And 0 requests were received
 
     Scenario: Running with an invalid API key set
         When I set the API key to "some-invalid-key"
         When I crash the app using no-op
         Then the monitor process exited with an error
-        And "$BUGSNAG_API_KEY must be a 32-character hexadecimal value" was printed to stderr
-        And "Usage: ./panic-monitor EXECUTABLE [EXECUTABLE args]" was printed to stdout
+        Then the following messages were printed to stderr:
+            | $BUGSNAG_API_KEY must be a 32-character hexadecimal value |
+            | Usage: ./panic-monitor EXECUTABLE [EXECUTABLE args]       |
         And 0 requests were received
 
     Scenario: Running with an unknown program
@@ -26,8 +28,9 @@ Feature: Printing information about what went wrong
         When I set the API key to "035d2472bd130ac0ab0f52715bbdc65d"
         And I run the monitor with arguments ""
         Then the monitor process exited with an error
-        And "No program specified" was printed to stderr
-        And "Usage: ./panic-monitor EXECUTABLE [EXECUTABLE args]" was printed to stdout
+        Then the following messages were printed to stderr:
+            | No program specified                                     |
+            | Usage: ./panic-monitor EXECUTABLE [EXECUTABLE args]      |
         And 0 requests were received
 
     Scenario: Debug logging for failed panic detection
