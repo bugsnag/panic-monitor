@@ -36,3 +36,16 @@ Feature: Configuring Bugsnag
             | file     | method        | lineNumber |
             | cases.go | explicitPanic | 17         |
             | main.go  | main          | 11         |
+
+    Scenario: Delivering events filtering through notify release stages
+        When I set "BUGSNAG_NOTIFY_RELEASE_STAGES" to "prod,beta" in the environment
+        When I set "BUGSNAG_RELEASE_STAGE" to "beta" in the environment
+        And I crash the app using explicit panic
+        Then the monitor process exited with an error
+
+    Scenario: Suppressing events through notify release stages
+        When I set "BUGSNAG_NOTIFY_RELEASE_STAGES" to "prod,beta" in the environment
+        When I set "BUGSNAG_RELEASE_STAGE" to "dev" in the environment
+        And I crash the app using explicit panic
+        Then the monitor process exited with an error
+        And 0 requests were received

@@ -16,16 +16,17 @@ panic-monitor PROGRAM [PROGRAM arguments]
 
 Override the default values in the monitor through environment variables:
 
-| Key                        | Value |
-|----------------------------|-------|
-| BUGSNAG\_API\_KEY          | **(required)** Your API key, available on the Bugsnag dashboard |
-| BUGSNAG\_APP\_TYPE         | Application component, like a router, mailer, or queue|
-| BUGSNAG\_APP\_VERSION      | Current version of the application |
-| BUGSNAG\_ENDPOINT          | Event Server address for Bugsnag On-premise |
-| BUGSNAG\_HOSTNAME          | Device hostname |
-| BUGSNAG\_PROJECT\_PACKAGES | Comma-delimited list of Go packages to be considered a part of the application |
-| BUGSNAG\_RELEASE\_STAGE    | The deployment stage of the application, like "production" or "beta" or "staging" |
-| BUGSNAG\_SOURCE\_ROOT      | The directory where source packages are built and the assumed prefix of package directories |
+| Key                              | Value |
+|----------------------------------|-------|
+| BUGSNAG\_API\_KEY                | **(required)** Your API key, available on the Bugsnag dashboard |
+| BUGSNAG\_APP\_TYPE               | Application component, like a router, mailer, or queue|
+| BUGSNAG\_APP\_VERSION            | Current version of the application |
+| BUGSNAG\_ENDPOINT                | Event Server address for Bugsnag On-premise |
+| BUGSNAG\_HOSTNAME                | Device hostname |
+| BUGSNAG\_NOTIFY\_RELEASE\_STAGES | Comma-delimited list of release stages to notify in |
+| BUGSNAG\_PROJECT\_PACKAGES       | Comma-delimited list of Go packages to be considered a part of the application |
+| BUGSNAG\_RELEASE\_STAGE          | The deployment stage of the application, like "production" or "beta" or "staging" |
+| BUGSNAG\_SOURCE\_ROOT            | The directory where source packages are built and the assumed prefix of package directories |
 
 ## Examples
 

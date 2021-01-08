@@ -89,6 +89,9 @@ func configureBugsnag() error {
 	if appType := os.Getenv("BUGSNAG_APP_TYPE"); appType != "" {
 		config.AppType = appType
 	}
+	if stages := os.Getenv("BUGSNAG_NOTIFY_RELEASE_STAGES"); stages != "" {
+		config.NotifyReleaseStages = strings.Split(stages, ",")
+	}
 	if packages := os.Getenv("BUGSNAG_PROJECT_PACKAGES"); packages != "" {
 		config.ProjectPackages = strings.Split(packages, ",")
 	}
