@@ -76,8 +76,10 @@ Then(/^I receive an error event matching (.*)$/) do |filename|
   # Remove variable components of report
   expect(actual["events"][0]["device"]["hostname"]).not_to be_nil
   expect(actual["events"][0]["device"]["osName"]).not_to be_nil
+  expect(actual["notifier"]["version"]).not_to be_nil
   actual["events"][0]["device"].delete("hostname")
   actual["events"][0]["device"].delete("osName")
+  actual["notifier"].delete("version")
 
   # Separate stacktrace for more complex testing
   actual_stack = actual["events"][0]["exceptions"][0].delete("stacktrace")
@@ -87,6 +89,7 @@ Then(/^I receive an error event matching (.*)$/) do |filename|
   File.open(File.join('features/fixtures', filename), 'r') do |f|
     payload = f.read.strip.gsub("[[GO_VERSION]]", GO_VERSION)
     expected = JSON.parse(payload)
+    expected["notifier"].delete("version")
     expected_stack = expected["events"][0]["exceptions"][0].delete("stacktrace")
     expect(expected_stack).not_to be_nil
     expect(actual).to eq(expected)
