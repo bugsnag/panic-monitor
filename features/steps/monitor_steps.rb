@@ -84,11 +84,16 @@ Then(/^I receive an error event matching (.*)$/) do |filename|
   # Separate stacktrace for more complex testing
   actual_stack = actual["events"][0]["exceptions"][0].delete("stacktrace")
   expect(actual_stack).not_to be_nil
+  # Separate message - some have gotten more detailed in newer versions
+  actual_message = actual["events"][0]["exceptions"][0].delete("message")
+  expect(actual_message).not_to be_nil
 
   # Test against fixture file
   File.open(File.join('features/fixtures', filename), 'r') do |f|
     payload = f.read.strip.gsub("[[GO_VERSION]]", GO_VERSION)
     expected = JSON.parse(payload)
+    expected_message = expected["events"][0]["exceptions"][0].delete("message")
+    expect(actual_message).to start_with(expected_message)
     expected["notifier"].delete("version")
     expected_stack = expected["events"][0]["exceptions"][0].delete("stacktrace")
     expect(expected_stack).not_to be_nil

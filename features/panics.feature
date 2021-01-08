@@ -17,3 +17,6 @@ Feature: Reporting fatal panics
             | nil goroutine         | fatal error: go of nil func value              | nil-goroutine.json  |
             | fake panic then real  | panic: REAL PANIC!                             | garbage-panic.json  |
             | stack exhaustion      | fatal error: stack overflow                    | stack-overflow.json |
+            | array overflow        | panic: runtime error: index out of range       | array-overflow.json |
+            | nil pointer deref     | runtime error: invalid memory address or nil pointer dereference | nil-pointer.json    |
+            | bad reflect swap      | panic: reflect: call of Swapper on string Value                  | reflect-swap.json   |

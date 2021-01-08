@@ -44,3 +44,16 @@ func stackExhaustion() {
 	}
 	f([1000]int64{})
 }
+
+func arrayOverflow() {
+	items := []int{1,2}
+	fmt.Printf("the third item: %d", items[3])
+}
+
+func nilPointerDeref() {
+	type Item struct {
+		Text *string
+	}
+	item := Item{}
+	fmt.Printf("contents: %s", *item.Text)
+}
