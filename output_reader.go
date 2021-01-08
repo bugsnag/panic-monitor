@@ -8,6 +8,8 @@ import (
 	l "github.com/bugsnag/proc-launcher/launcher"
 )
 
+const minBufferLen int = 16
+
 type outputReader struct {
 	buffer    *bytes.Buffer
 	panicType int
@@ -38,6 +40,11 @@ func (reader *outputReader) ReadStderr(contents []byte) {
 				reader.panicType = index
 				break
 			}
+		}
+		if !reader.FoundPanic() && reader.buffer.Len() > minBufferLen {
+			// truncate all but a buffer long enough to contain an incomplete
+			// panic header
+			reader.buffer.Truncate(minBufferLen)
 		}
 	}
 }
