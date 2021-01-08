@@ -3,6 +3,12 @@
 An executable which launches a program, awaiting its exit. In the event of
 a go panic, it is automatically reported to Bugsnag.
 
+## Installation
+
+```sh
+go install github.com/bugsnag/panic-monitor
+```
+
 ## Usage
 
 Set your Bugsnag API key as the environment variable `BUGSNAG_API_KEY`, then
