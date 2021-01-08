@@ -11,6 +11,9 @@ Feature: Reporting fatal panics
         And I receive an error event matching <fixture>
 
         Examples:
-            | case                  | message                                        | fixture            |
-            | explicit panic        | panic: PANIQ!                                  | panic.json         |
-            | concurrent read/write | fatal error: concurrent map read and map write | map-readwrite.json |
+            | case                  | message                                        | fixture             |
+            | explicit panic        | panic: PANIQ!                                  | panic.json          |
+            | concurrent read/write | fatal error: concurrent map read and map write | map-readwrite.json  |
+            | nil goroutine         | fatal error: go of nil func value              | nil-goroutine.json  |
+            | fake panic then real  | panic: REAL PANIC!                             | garbage-panic.json  |
+            | stack exhaustion      | fatal error: stack overflow                    | stack-overflow.json |

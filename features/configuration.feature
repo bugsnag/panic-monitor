@@ -29,7 +29,7 @@ Feature: Configuring Bugsnag
         And 1 request was received
         And the payload contains the following in-project stack frames:
             | file     | method        | lineNumber |
-            | cases.go | explicitPanic | 17         |
+            | cases.go | explicitPanic | 22         |
             | main.go  | main          | 11         |
 
     Scenario: Configuring source root
@@ -39,7 +39,7 @@ Feature: Configuring Bugsnag
         And 1 request was received
         And the payload contains the following in-project stack frames:
             | file     | method        | lineNumber |
-            | cases.go | explicitPanic | 17         |
+            | cases.go | explicitPanic | 22         |
             | main.go  | main          | 11         |
 
     Scenario: Delivering events filtering through notify release stages
