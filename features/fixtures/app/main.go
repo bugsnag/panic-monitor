@@ -23,5 +23,7 @@ func main() {
 		nilPointerDeref()
 	case "bad reflect swap":
 		badSwap(0, "boo")
+	case "goroutine":
+		panicInAGoroutine()
 	}
 }

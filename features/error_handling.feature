@@ -5,7 +5,7 @@ Feature: Printing information about what went wrong
         Then the monitor process exited with an error
         Then the following messages were printed to stderr:
             | Failed to launch monitor: Missing required $BUGSNAG_API_KEY |
-            | Usage: ./panic-monitor EXECUTABLE [EXECUTABLE args]         |
+            | ./panic-monitor EXECUTABLE [EXECUTABLE args]                |
         And 0 requests were received
 
     Scenario: Running with an invalid API key set
@@ -14,7 +14,7 @@ Feature: Printing information about what went wrong
         Then the monitor process exited with an error
         Then the following messages were printed to stderr:
             | $BUGSNAG_API_KEY must be a 32-character hexadecimal value |
-            | Usage: ./panic-monitor EXECUTABLE [EXECUTABLE args]       |
+            | ./panic-monitor EXECUTABLE [EXECUTABLE args]              |
         And 0 requests were received
 
     Scenario: Running with an unknown program
@@ -29,8 +29,8 @@ Feature: Printing information about what went wrong
         And I run the monitor with arguments ""
         Then the monitor process exited with an error
         Then the following messages were printed to stderr:
-            | No program specified                                     |
-            | Usage: ./panic-monitor EXECUTABLE [EXECUTABLE args]      |
+            | No program specified                         |
+            | ./panic-monitor EXECUTABLE [EXECUTABLE args] |
         And 0 requests were received
 
     Scenario: Debug logging for failed panic detection

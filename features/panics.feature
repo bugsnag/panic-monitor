@@ -13,6 +13,7 @@ Feature: Reporting fatal panics
         Examples:
             | case                  | message                                        | fixture             |
             | explicit panic        | panic: PANIQ!                                  | panic.json          |
+            | goroutine             | panic: at the disco?                           | goroutine.json      |
             | concurrent read/write | fatal error: concurrent map read and map write | map-readwrite.json  |
             | nil goroutine         | fatal error: go of nil func value              | nil-goroutine.json  |
             | fake panic then real  | panic: REAL PANIC!                             | garbage-panic.json  |
