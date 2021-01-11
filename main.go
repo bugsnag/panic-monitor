@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"regexp"
-	"strings"
 
 	bugsnag "github.com/bugsnag/bugsnag-go/v2"
 )
@@ -54,7 +53,7 @@ Metadata:
  Add metadata through environment variables prefixed with BUGSNAG_METADATA_.
 
  The environment variable name after the prefix is expected to be the tab and
- key name, delimited by a period.
+ key name, delimited by an underscore.
 
  Underscores in the the tab and/or key values are replaced with spaces.
 
@@ -62,8 +61,8 @@ Metadata:
 
   Given these environment variables:
 
-  * BUGSNAG_METADATA_device.KubePod="carrot-delivery-service-beta1 reg3"
-  * BUGSNAG_METADATA_device.deployment_area=region5_1
+  * BUGSNAG_METADATA_device_KubePod="carrot-delivery-service-beta1 reg3"
+  * BUGSNAG_METADATA_device_deployment_area=region5_1
 
   The following fields would be added to a panic report:
 
@@ -74,6 +73,7 @@ Metadata:
 
 var (
 	version = flag.Bool("version", false, "The version of panic-monitor")
+	APIKeyMatcher *regexp.Regexp = regexp.MustCompile("^[0-9a-fA-f]{32}$")
 )
 
 func main() {
@@ -125,12 +125,9 @@ func printErr(format string, args ...interface{}) {
 }
 
 func configureBugsnag() error {
-	matcher := regexp.MustCompile("^[0-9a-fA-f]{32}$")
-	apiKey := os.Getenv("BUGSNAG_API_KEY")
-	if apiKey == "" {
-		return fmt.Errorf("Missing required $BUGSNAG_API_KEY environment variable\n")
-	} else if !matcher.MatchString(apiKey) {
-		return fmt.Errorf("$BUGSNAG_API_KEY must be a 32-character hexadecimal value")
+	apiKey, err := validateAPIKey(os.Getenv("BUGSNAG_API_KEY"))
+	if err != nil {
+		return err
 	}
 
 	config := bugsnag.Configuration{
@@ -145,48 +142,17 @@ func configureBugsnag() error {
 		config.Logger = &logger{}
 	}
 
-	if stage := os.Getenv("BUGSNAG_RELEASE_STAGE"); stage != "" {
-		config.ReleaseStage = stage
-	}
-	if app_version := os.Getenv("BUGSNAG_APP_VERSION"); app_version != "" {
-		config.AppVersion = app_version
-	}
-	if hostname := os.Getenv("BUGSNAG_HOSTNAME"); hostname != "" {
-		config.Hostname = hostname
-	}
-	if sourceRoot := os.Getenv("BUGSNAG_SOURCE_ROOT"); sourceRoot != "" {
-		config.SourceRoot = sourceRoot
-	}
-	if appType := os.Getenv("BUGSNAG_APP_TYPE"); appType != "" {
-		config.AppType = appType
-	}
-	if stages := os.Getenv("BUGSNAG_NOTIFY_RELEASE_STAGES"); stages != "" {
-		config.NotifyReleaseStages = strings.Split(stages, ",")
-	}
-	if packages := os.Getenv("BUGSNAG_PROJECT_PACKAGES"); packages != "" {
-		config.ProjectPackages = strings.Split(packages, ",")
-	}
-	if endpoint := os.Getenv("BUGSNAG_ENDPOINT"); endpoint != "" {
-		config.Endpoints = bugsnag.Endpoints{
-			Notify:   endpoint,
-			Sessions: "",
-		}
-	}
-
-	bugsnag.OnBeforeNotify(func(event *bugsnag.Event, config *bugsnag.Configuration) error {
-		for _, value := range os.Environ() {
-			key, value, err := parseEnvironmentPair(value)
-			if err != nil {
-				continue
-			}
-			if keypath, err := parseMetadataKeypath(key); err == nil {
-				addMetadata(event, keypath, value)
-			}
-		}
-
-		return nil
-	})
-
 	bugsnag.Configure(config)
 	return nil
+}
+
+func validateAPIKey(key string) (string, error) {
+	apiKey := os.Getenv("BUGSNAG_API_KEY")
+	if apiKey == "" {
+		return "", fmt.Errorf("Missing required $BUGSNAG_API_KEY environment variable\n")
+	} else if !APIKeyMatcher.MatchString(apiKey) {
+		return "", fmt.Errorf("$BUGSNAG_API_KEY must be a 32-character hexadecimal value")
+	}
+
+	return apiKey, nil
 }

@@ -39,15 +39,15 @@ Override the default values in the monitor through environment variables:
 Add metadata through environment variables prefixed with `BUGSNAG_METADATA_`.
 
 The environment variable name after the prefix is expected to be the tab and key name,
-delimited by a period.
+delimited by an underscore.
 
 Underscores in the the tab and/or key values are replaced with spaces.
 
 Examples:
 
 ```sh
-BUGSNAG_METADATA_device.KubePod="carrot-delivery-service-beta1 reg3"
-BUGSNAG_METADATA_device.deployment_area=region5_1
+BUGSNAG_METADATA_device_KubePod="carrot-delivery-service-beta1 reg3"
+BUGSNAG_METADATA_device_deployment_area=region5_1
 ```
 
 Would add the following metadata to the `device` tab in the event of a panic:
