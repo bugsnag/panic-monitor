@@ -18,6 +18,11 @@ launch your program
 panic-monitor PROGRAM [PROGRAM arguments]
 ```
 
+### Detection
+
+Detect when a program was launched via panic-monitor by the presence of the
+environment variable `BUGSNAG_PANIC_MONITOR`.
+
 ### Configuration
 
 Override the default values in the monitor through environment variables:

@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"os"
 	"sync"
 
 	l "github.com/bugsnag/proc-launcher/launcher"
@@ -56,6 +57,7 @@ func (reader *outputReader) AtExit(code int) {
 }
 
 func (reader *outputReader) runProcess(args ...string) error {
+	os.Setenv("BUGSNAG_PANIC_MONITOR", "1")
 	reader.group.Add(1)
 	launcher := l.New(args...)
 	launcher.InstallPlugin(reader)
