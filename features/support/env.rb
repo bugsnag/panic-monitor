@@ -1,4 +1,5 @@
 require 'open3'
+require 'os'
 
 BUILD_DIR = File.join(Dir.pwd, "build")
 FIXTURE_DIR = File.expand_path(File.join(File.dirname(__FILE__), '..', 'fixtures'))
@@ -7,12 +8,19 @@ VERBOSE = ENV['VERBOSE'] || ARGV.include?('--verbose')
 GO_VERSION =`go version`.split[2]
 
 FileUtils.mkdir_p BUILD_DIR
+
+# Binary name for test apps
+def executable name
+  return "./#{name}.exe" if OS.windows?
+  return "./#{name}"
+end
+
 # Build executables for the tests
 Dir.chdir(BUILD_DIR) do
   `go build ..`
-  raise "Failed to build monitor" unless File.exists? "panic-monitor"
+  raise "Failed to build monitor" unless File.exists? executable("panic-monitor")
   `go build ../features/fixtures/app`
-  raise "Failed to build sample app" unless File.exists? "app"
+  raise "Failed to build sample app" unless File.exists? executable("app")
 end
 
 Before do

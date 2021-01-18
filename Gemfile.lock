@@ -47,6 +47,7 @@ GEM
     middleware (0.1.0)
     minitest (5.14.3)
     multi_test (0.1.2)
+    os (1.1.1)
     protobuf-cucumber (3.10.8)
       activesupport (>= 3.2)
       middleware
@@ -69,6 +70,7 @@ PLATFORMS
 
 DEPENDENCIES
   cucumber
+  os
   rspec-expectations
 
 BUNDLED WITH

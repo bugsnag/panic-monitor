@@ -14,7 +14,7 @@ class Webserver
 
   def initialize
     @events = []
-    dev_null = WEBrick::Log::new("/dev/null", 7)
+    dev_null = WEBrick::Log.new(File.open(File::NULL, 'w'))
     @server = WEBrick::HTTPServer.new Port: 8000, AccessLog: dev_null, :Logger => dev_null
     @server.mount_proc '/events' do |req, res|
       @events.append(Event.new(req))

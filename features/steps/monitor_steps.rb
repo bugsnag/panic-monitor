@@ -1,13 +1,13 @@
 When(/^I crash the app using (.*)$/) do |testcase|
   add_to_environment("TESTCASE", testcase)
   Dir.chdir(BUILD_DIR) do
-    start_process(["./panic-monitor", "./app"])
+    start_process([executable("panic-monitor"), executable("app")])
   end
 end
 
 When('I run the monitor with arguments {string}') do |args|
   Dir.chdir(BUILD_DIR) do
-    start_process(["./panic-monitor"] + args.split(' '))
+    start_process([executable("panic-monitor")] + args.split(' '))
   end
 end
 
@@ -15,7 +15,7 @@ end
 When("I run the monitor with:") do |table|
   Dir.chdir(BUILD_DIR) do
     args = table.raw.flatten
-    start_process(["./panic-monitor"] + args)
+    start_process([executable("panic-monitor")] + args)
   end
 end
 
@@ -118,7 +118,7 @@ def validate_stacktrace actual_stack, expected_stack
       found = found + 1 # detect excess frames without false negatives
     end
   end
-  expect(found).to eq(expected_len), "expected #{expected_len} matching frames but found #{found}. stacktrace:\n#{actual_stack}"
+  expect(found).to eq(expected_len), "expected #{expected_len} matching frames but found #{found}. stacktrace:\n#{actual_stack}\nexpected these in-project frames:\n#{expected_stack}"
 end
 
 Then('the payload contains the following in-project stack frames:') do |table|
