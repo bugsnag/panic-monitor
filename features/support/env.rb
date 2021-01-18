@@ -19,7 +19,7 @@ Before do
   PROCESSES.clear
   @server = Webserver.new
   @server.start
-  @env = {"BUGSNAG_ENDPOINT" => @server.address }
+  @env = {"BUGSNAG_NOTIFY_ENDPOINT" => @server.address }
 end
 
 After do
