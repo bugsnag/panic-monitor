@@ -46,8 +46,6 @@ Add metadata through environment variables prefixed with `BUGSNAG_METADATA_`.
 The environment variable name after the prefix is expected to be the tab and key name,
 delimited by an underscore.
 
-Underscores in the the tab and/or key values are replaced with spaces.
-
 Examples:
 
 ```sh
@@ -58,7 +56,7 @@ BUGSNAG_METADATA_device_deployment_area=region5_1
 Would add the following metadata to the `device` tab in the event of a panic:
 
 * `KubePod`: `carrot-delivery-service-beta1 reg3`
-* `deployment area`: `region5_1`
+* `deployment_area`: `region5_1`
 
 ## Examples
 

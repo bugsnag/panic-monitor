@@ -17,6 +17,11 @@ Feature: Configuring Bugsnag
             | BUGSNAG_RELEASE_STAGE | beta1           | app.releaseStage  |
             | BUGSNAG_HOSTNAME      | dream-machine-2 | device.hostname   |
 
+            | BUGSNAG_METADATA_device_instance      | kube2-33-A | metaData.device.instance      |
+            | BUGSNAG_METADATA_framework_version    | v3.1.0     | metaData.framework.version    |
+            | BUGSNAG_METADATA_device_runtime_level | 1C         | metaData.device.runtime_level |
+            | BUGSNAG_METADATA_Carrot               | orange     | metaData.custom.Carrot        |
+
     Scenario: Configuring project packages
         When I set "BUGSNAG_PROJECT_PACKAGES" to "main,github.com/bugsnag/panic-monitor/features/fixtures/app" in the environment
         And I crash the app using explicit panic
