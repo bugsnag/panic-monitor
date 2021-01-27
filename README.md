@@ -63,13 +63,14 @@ Would add the following metadata to the `device` tab in the event of a panic:
 Build one of the example crashing apps using `go build`:
 
 ```sh
-TESTCASE="explicit panic" go build features/fixtures/app
+go build features/fixtures/app
 ```
 
 Then run it using the monitor:
 
 ```sh
-BUGSNAG_API_KEY="your-api-key-here" panic-monitor ./app
+export BUGSNAG_API_KEY="your-api-key-here"
+TESTCASE="explicit panic" panic-monitor ./app
 ```
 
 ## Testing
