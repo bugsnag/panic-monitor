@@ -32,7 +32,7 @@ Override the default values in the monitor through environment variables:
 | BUGSNAG\_API\_KEY                | **(required)** Your API key, available on the Bugsnag dashboard |
 | BUGSNAG\_APP\_TYPE               | Application component, like a router, mailer, or queue|
 | BUGSNAG\_APP\_VERSION            | Current version of the application |
-| BUGSNAG\_ENDPOINT                | Event Server address for Bugsnag On-premise |
+| BUGSNAG\_NOTIFY\_ENDPOINT        | Event Server address for Bugsnag On-premise |
 | BUGSNAG\_HOSTNAME                | Device hostname |
 | BUGSNAG\_NOTIFY\_RELEASE\_STAGES | Comma-delimited list of release stages to notify in |
 | BUGSNAG\_PROJECT\_PACKAGES       | Comma-delimited list of Go packages to be considered a part of the application |

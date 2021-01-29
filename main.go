@@ -36,7 +36,7 @@ Environment Variables:
                                Bugsnag dashboard
  BUGSNAG_APP_TYPE              Application component, like a router or queue
  BUGSNAG_APP_VERSION           Current version of the application
- BUGSNAG_ENDPOINT              Event Server address for Bugsnag On-premise
+ BUGSNAG_NOTIFY_ENDPOINT       Event Server address for Bugsnag On-premise
  BUGSNAG_HOSTNAME              Device hostname
  BUGSNAG_METADATA_*            Additional values which will be reported in the
                                event of a panic. See 'Metadata'.
