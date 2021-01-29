@@ -39,6 +39,10 @@ Then("payload field {string} equals {string}") do |keypath, expected_value|
   expect(read_key_path(actual["events"][0], keypath)).to eq(expected_value)
 end
 
+Then("I wait for {float} seconds") do |count|
+  sleep(count)
+end
+
 Then("1 request was received") do
   step("1 requests were received")
 end

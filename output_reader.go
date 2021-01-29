@@ -57,6 +57,9 @@ func (reader *outputReader) AtExit(code int) {
 }
 
 func (reader *outputReader) runProcess(args ...string) error {
+	// Disable panic handler in the child process
+	os.Setenv("BUGSNAG_DISABLE_PANIC_HANDLER", "1")
+	// Expose panic handler to child process
 	os.Setenv("BUGSNAG_PANIC_MONITOR", "1")
 	reader.group.Add(1)
 	launcher := l.New(args...)
