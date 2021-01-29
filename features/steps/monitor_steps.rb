@@ -1,7 +1,7 @@
-When(/^I crash the app using (.*)$/) do |testcase|
+When(/^I crash the ([\w\-]+) using (.*)$/) do |appname, testcase|
   add_to_environment("TESTCASE", testcase)
   Dir.chdir(BUILD_DIR) do
-    start_process([executable("panic-monitor"), executable("app")])
+    start_process([executable("panic-monitor"), executable(appname)])
   end
 end
 

@@ -21,6 +21,8 @@ Dir.chdir(BUILD_DIR) do
   raise "Failed to build monitor" unless File.exists? executable("panic-monitor")
   `go build ../features/fixtures/app`
   raise "Failed to build sample app" unless File.exists? executable("app")
+  `go build ../features/fixtures/bugsnag-app`
+  raise "Failed to build sample app with bugsnag" unless File.exists? executable("bugsnag-app")
 end
 
 Before do
