@@ -21,3 +21,11 @@ Feature: Reporting fatal panics
             | array overflow        | panic: runtime error: index out of range       | array-overflow.json |
             | nil pointer deref     | runtime error: invalid memory address or nil pointer dereference | nil-pointer.json    |
             | bad reflect swap      | panic: reflect: call of Swapper on string Value                  | reflect-swap.json   |
+
+    Scenario: Avoid double-reporting panics
+        When I crash the bugsnag-app using explicit panic
+        And I wait for 2 seconds
+        Then the monitor process exited with an error
+        And 1 request was received
+        And "oh no!" was printed to stderr
+        And I receive an error event matching oh-no-panic.json

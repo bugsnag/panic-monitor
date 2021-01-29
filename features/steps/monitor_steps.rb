@@ -1,7 +1,7 @@
-When(/^I crash the app using (.*)$/) do |testcase|
+When(/^I crash the ([\w\-]+) using (.*)$/) do |appname, testcase|
   add_to_environment("TESTCASE", testcase)
   Dir.chdir(BUILD_DIR) do
-    start_process([executable("panic-monitor"), executable("app")])
+    start_process([executable("panic-monitor"), executable(appname)])
   end
 end
 
@@ -37,6 +37,10 @@ Then("payload field {string} equals {string}") do |keypath, expected_value|
   actual = JSON.parse(event.body)
   expect(actual["events"].length).to eq(1)
   expect(read_key_path(actual["events"][0], keypath)).to eq(expected_value)
+end
+
+Then("I wait for {float} seconds") do |count|
+  sleep(count)
 end
 
 Then("1 request was received") do
