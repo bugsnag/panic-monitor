@@ -4,10 +4,11 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+
 	e "github.com/bugsnag/bugsnag-go/v2/errors"
 )
 
-var panicHeaders = [][]byte {
+var panicHeaders = [][]byte{
 	[]byte("panic:"),
 	[]byte("fatal error:"),
 }
@@ -47,7 +48,7 @@ func parsePanic(text string) (*uncaughtPanic, error) {
 			for _, prefix := range prefixes {
 				if strings.HasPrefix(line, prefix) {
 					message = strings.TrimSpace(strings.TrimPrefix(line, prefix))
-					typeName = prefix[:len(prefix) - 1]
+					typeName = prefix[:len(prefix)-1]
 					state = "seek"
 					break
 				}
