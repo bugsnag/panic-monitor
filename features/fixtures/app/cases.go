@@ -46,7 +46,7 @@ func stackExhaustion() {
 }
 
 func arrayOverflow() {
-	items := []int{1,2}
+	items := []int{1, 2}
 	fmt.Printf("the third item: %d", items[3])
 }
 

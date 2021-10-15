@@ -11,7 +11,7 @@ import (
 
 const (
 	Version = "1.0.0"
-	Usage = `%[1]s: A Go program launcher which automatically reports panics
+	Usage   = `%[1]s: A Go program launcher which automatically reports panics
 
 Usage:
 
@@ -70,7 +70,7 @@ Metadata:
 )
 
 var (
-	version = flag.Bool("version", false, "The version of panic-monitor")
+	version                      = flag.Bool("version", false, "The version of panic-monitor")
 	APIKeyMatcher *regexp.Regexp = regexp.MustCompile("^[0-9a-fA-f]{32}$")
 )
 

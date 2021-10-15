@@ -1,9 +1,10 @@
 package main
 
 import (
-	e "github.com/bugsnag/bugsnag-go/v2/errors"
 	"reflect"
 	"testing"
+
+	e "github.com/bugsnag/bugsnag-go/v2/errors"
 )
 
 var createdBy = `panic: hello!
