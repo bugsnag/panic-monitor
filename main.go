@@ -99,16 +99,19 @@ func main() {
 		os.Exit(1)
 	}
 
-	event, detectionErr := reader.detectedPanic()
+	event, metadata, detectionErr := reader.detectedPanic()
 	if detectionErr != nil && debugModeEnabled() {
 		printErr("%v", detectionErr)
 	}
 	if event != nil {
+		if metadata == nil {
+			metadata = &bugsnag.MetaData{}
+		}
 		bugsnag.Notify(event, bugsnag.HandledState{
 			SeverityReason:   bugsnag.SeverityReasonUnhandledPanic,
 			OriginalSeverity: bugsnag.SeverityError,
 			Unhandled:        true,
-		}, bugsnag.ErrorClass{Name: event.typeName})
+		}, bugsnag.ErrorClass{Name: event.typeName}, *metadata)
 	}
 
 	os.Exit(reader.exitCode)

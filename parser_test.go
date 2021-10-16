@@ -2,8 +2,10 @@ package main
 
 import (
 	"reflect"
+	"strconv"
 	"testing"
 
+	"github.com/bugsnag/bugsnag-go/v2"
 	e "github.com/bugsnag/bugsnag-go/v2/errors"
 )
 
@@ -120,6 +122,28 @@ main.stackExhaustion.func1(0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, ...
 ...additional frames elided...
 `
 
+var unexpectedSignal = `fatal error: unexpected signal during runtime execution
+[signal SIGSEGV: segmentation violation code=0x1 addr=0x0 pc=0x408db3e]
+
+runtime stack:
+runtime.throw({0x40ac264, 0x7fff203462d6})
+	/usr/local/Cellar/go/1.17.1/libexec/src/runtime/panic.go:1198 +0x71
+runtime.sigpanic()
+	/usr/local/Cellar/go/1.17.1/libexec/src/runtime/signal_unix.go:719 +0x396
+
+goroutine 1 [syscall]:
+runtime.cgocall(0x408daf0, 0xc000064f38)
+	/usr/local/Cellar/go/1.17.1/libexec/src/runtime/cgocall.go:156 +0x5c fp=0xc000064f10 sp=0xc000064ed8 pc=0x400643c
+main._Cfunc_testSig(0x0)
+	_cgo_gotypes.go:40 +0x45 fp=0xc000064f38 sp=0xc000064f10 pc=0x408da05
+main.main()
+	/Users/bugsnag/develop/cgo_segfault/main.go:9 +0x25 fp=0xc000064f80 sp=0xc000064f38 pc=0x408da85
+runtime.main()
+	/usr/local/Cellar/go/1.17.1/libexec/src/runtime/proc.go:255 +0x227 fp=0xc000064fe0 sp=0xc000064f80 pc=0x4035667
+runtime.goexit()
+	/usr/local/Cellar/go/1.17.1/libexec/src/runtime/asm_amd64.s:1581 +0x1 fp=0xc000064fe8 sp=0xc000064fe0 pc=0x405eba1
+`
+
 var result = []e.StackFrame{
 	{File: "/0/c/go/src/pkg/runtime/panic.c", LineNumber: 279, Name: "panic", Package: "runtime"},
 	{File: "/0/go/src/github.com/loopj/bugsnag-example-apps/go/revelapp/app/controllers/app.go", LineNumber: 13, Name: "func.001", Package: "github.com/loopj/bugsnag-example-apps/go/revelapp/app/controllers"},
@@ -138,7 +162,7 @@ func TestParsePanic(t *testing.T) {
 	}
 
 	for key, val := range todo {
-		Err, err := parsePanic(val)
+		Err, metadata, err := parsePanic(val)
 
 		if err != nil {
 			t.Fatal(err)
@@ -154,6 +178,10 @@ func TestParsePanic(t *testing.T) {
 
 		if Err.StackFrames()[0].Func() != nil {
 			t.Errorf("Somehow managed to find a func...")
+		}
+
+		if metadata != nil {
+			t.Errorf("Unexpectedly returned metadata...")
 		}
 
 		result := result
@@ -192,7 +220,7 @@ created by main.concurrentWrite
 
 func TestParseFatalError(t *testing.T) {
 
-	Err, err := parsePanic(concurrentMapReadWrite)
+	Err, metadata, err := parsePanic(concurrentMapReadWrite)
 
 	if err != nil {
 		t.Fatal(err)
@@ -208,6 +236,10 @@ func TestParseFatalError(t *testing.T) {
 
 	if Err.StackFrames()[0].Func() != nil {
 		t.Errorf("Somehow managed to find a func...")
+	}
+
+	if metadata != nil {
+		t.Errorf("Unexpectedly returned metadata...")
 	}
 
 	var result = []e.StackFrame{
@@ -231,7 +263,7 @@ func TestParseFatalError(t *testing.T) {
 }
 
 func TestParseStackOverflow(t *testing.T) {
-	Err, err := parsePanic(stackOverflow)
+	Err, metadata, err := parsePanic(stackOverflow)
 
 	if err != nil {
 		t.Fatal(err)
@@ -249,12 +281,76 @@ func TestParseStackOverflow(t *testing.T) {
 		t.Errorf("Somehow managed to find a func...")
 	}
 
+	if metadata != nil {
+		t.Errorf("Unexpectedly returned metadata...")
+	}
+
 	var result = []e.StackFrame{
 		{File: "/go/src/app/cases.go", LineNumber: 42, Name: "stackExhaustion.func1", Package: "main"},
 		{File: "/go/src/app/cases.go", LineNumber: 43, Name: "stackExhaustion.func1", Package: "main"},
 		{File: "/go/src/app/cases.go", LineNumber: 43, Name: "stackExhaustion.func1", Package: "main"},
 		{File: "/go/src/app/cases.go", LineNumber: 43, Name: "stackExhaustion.func1", Package: "main"},
 		{File: "/go/src/app/cases.go", LineNumber: 43, Name: "stackExhaustion.func1", Package: "main"},
+	}
+
+	if !reflect.DeepEqual(Err.StackFrames(), result) {
+		t.Errorf("Wrong stack:")
+		for i, frame := range result {
+			t.Logf("[%d] %#v", i, frame)
+			if len(Err.StackFrames()) > i {
+				t.Logf("    %#v", Err.StackFrames()[i])
+			}
+		}
+	}
+}
+
+func TestParseSignal(t *testing.T) {
+	Err, metadata, err := parsePanic(unexpectedSignal)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if Err.TypeName() != "fatal error" {
+		t.Errorf("Wrong type: %s", Err.TypeName())
+	}
+
+	if Err.Error() != "unexpected signal during runtime execution" {
+		t.Errorf("Wrong message: '%s'", Err.Error())
+	}
+
+	if Err.StackFrames()[0].Func() != nil {
+		t.Errorf("Somehow managed to find a func...")
+	}
+
+	if metadata == nil {
+		t.Errorf("Missing Signal metadata...")
+	} else {
+		expectedMetadata := &bugsnag.MetaData{
+			"signal": {
+				"Signal":      "SIGSEGV",
+				"Description": "segmentation violation",
+				"Code":        "0x1",
+				"Addr":        "0x0",
+				"PC":          "0x408db3e",
+			},
+		}
+
+		if !reflect.DeepEqual(metadata, expectedMetadata) {
+			t.Errorf("Wrong metadata:")
+			for k, sigDetail := range *expectedMetadata {
+				t.Logf("[%s] %#v", k, sigDetail)
+				t.Logf("%-"+strconv.Itoa(len(k))+"s   %#v", "", (*metadata)[k])
+			}
+		}
+	}
+
+	var result = []e.StackFrame{
+		{File: "/usr/local/Cellar/go/1.17.1/libexec/src/runtime/cgocall.go", LineNumber: 156, Name: "cgocall", Package: "runtime"},
+		{File: "_cgo_gotypes.go", LineNumber: 40, Name: "_Cfunc_testSig", Package: "main"},
+		{File: "/Users/bugsnag/develop/cgo_segfault/main.go", LineNumber: 9, Name: "main", Package: "main"},
+		{File: "/usr/local/Cellar/go/1.17.1/libexec/src/runtime/proc.go", LineNumber: 255, Name: "main", Package: "runtime"},
+		{File: "/usr/local/Cellar/go/1.17.1/libexec/src/runtime/asm_amd64.s", LineNumber: 1581, Name: "goexit", Package: "runtime"},
 	}
 
 	if !reflect.DeepEqual(Err.StackFrames(), result) {

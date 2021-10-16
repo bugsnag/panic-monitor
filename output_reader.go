@@ -6,6 +6,7 @@ import (
 	"os"
 	"sync"
 
+	"github.com/bugsnag/bugsnag-go/v2"
 	l "github.com/bugsnag/proc-launcher/launcher"
 )
 
@@ -74,9 +75,9 @@ func (reader *outputReader) runProcess(args ...string) error {
 	return nil
 }
 
-func (reader *outputReader) detectedPanic() (*uncaughtPanic, error) {
+func (reader *outputReader) detectedPanic() (*uncaughtPanic, *bugsnag.MetaData, error) {
 	if !reader.FoundPanic() {
-		return nil, fmt.Errorf("No panic detected")
+		return nil, nil, fmt.Errorf("No panic detected")
 	}
 	return parsePanic(string(reader.buffer.Bytes()))
 }
