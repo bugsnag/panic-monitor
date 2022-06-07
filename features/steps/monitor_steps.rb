@@ -84,6 +84,13 @@ Then(/^I receive an error event matching (.*)$/) do |filename|
   actual["events"][0]["device"].delete("hostname")
   actual["events"][0]["device"].delete("osName")
   actual["notifier"].delete("version")
+  metadata = actual["events"][0]["metaData"]
+  if metadata and metadata.has_key? "signal"
+    expect(metadata["signal"]["addr"]).to match /^0x[0-9a-f]+$/
+    expect(metadata["signal"]["code"]).to match /^0x[0-9a-f]+$/
+    expect(metadata["signal"]["pc"]).to match /^0x[0-9a-f]+$/
+    metadata.delete("signal")
+  end
 
   # Separate stacktrace for more complex testing
   actual_stack = actual["events"][0]["exceptions"][0].delete("stacktrace")
@@ -116,7 +123,9 @@ def validate_stacktrace actual_stack, expected_stack
     if found < expected_len and frame["inProject"] and
         frame["file"] == expected_stack[found]["file"] and
         frame["method"] == expected_stack[found]["method"] and
-        frame["lineNumber"] == expected_stack[found]["lineNumber"].to_i
+        (frame["lineNumber"] == expected_stack[found]["lineNumber"].to_i or
+         # leniency for line numbers for generated frames
+         frame["file"] == "_cgo_gotypes.go")
       found = found + 1
     elsif found >= expected_len and frame["inProject"]
       found = found + 1 # detect excess frames without false negatives

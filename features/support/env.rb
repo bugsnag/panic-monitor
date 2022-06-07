@@ -15,6 +15,10 @@ def executable name
   return "./#{name}"
 end
 
+def has_tag? scenario, tag_name
+  scenario.tags.map(&:name).include? tag_name
+end
+
 # Build executables for the tests
 Dir.chdir(BUILD_DIR) do
   `go build ..`
@@ -25,11 +29,14 @@ Dir.chdir(BUILD_DIR) do
   raise "Failed to build sample app with bugsnag" unless File.exists? executable("bugsnag-app")
 end
 
-Before do
-  PROCESSES.clear
-  @server = Webserver.new
-  @server.start
-  @env = {"BUGSNAG_NOTIFY_ENDPOINT" => @server.address }
+Before do |scenario|
+  if has_tag?(scenario, '@posix') and not OS.posix?
+    skip_this_scenario
+  else
+    @server = Webserver.new
+    @server.start
+    @env = {"BUGSNAG_NOTIFY_ENDPOINT" => @server.address }
+  end
 end
 
 After do
@@ -40,7 +47,10 @@ After do
     rescue
     end
   end
+  PROCESSES.clear
   @server.stop
+rescue
+  # avoid failing if server can't stop
 end
 
 at_exit do
