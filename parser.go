@@ -72,13 +72,13 @@ func parsePanic(text string) (*uncaughtPanic, *bugsnag.MetaData, error) {
 			fields := re.FindStringSubmatch(line)
 			if fields != nil {
 				// Note: we only add metadata here ATM. If more Metadata will be added elsewhere, then we need better initialization
+				typeName = fields[1]
+				message = fields[2]
 				metadata = &bugsnag.MetaData{
 					"signal": {
-						"Signal":      fields[1],
-						"Description": fields[2],
-						"Code":        fields[3],
-						"Addr":        fields[4],
-						"PC":          fields[5],
+						"code": fields[3],
+						"addr": fields[4],
+						"pc":   fields[5],
 					},
 				}
 			}

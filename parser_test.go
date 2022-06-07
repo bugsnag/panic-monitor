@@ -311,11 +311,11 @@ func TestParseSignal(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if Err.TypeName() != "fatal error" {
+	if Err.TypeName() != "SIGSEGV" {
 		t.Errorf("Wrong type: %s", Err.TypeName())
 	}
 
-	if Err.Error() != "unexpected signal during runtime execution" {
+	if Err.Error() != "segmentation violation" {
 		t.Errorf("Wrong message: '%s'", Err.Error())
 	}
 
@@ -328,11 +328,9 @@ func TestParseSignal(t *testing.T) {
 	} else {
 		expectedMetadata := &bugsnag.MetaData{
 			"signal": {
-				"Signal":      "SIGSEGV",
-				"Description": "segmentation violation",
-				"Code":        "0x1",
-				"Addr":        "0x0",
-				"PC":          "0x408db3e",
+				"code":        "0x1",
+				"addr":        "0x0",
+				"pc":          "0x408db3e",
 			},
 		}
 
