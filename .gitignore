@@ -1,2 +1,6 @@
 # Ignore generated executable
 panic-monitor
+
+# Avoid hard version requirement for bugsnag-go
+go.mod
+go.sum
