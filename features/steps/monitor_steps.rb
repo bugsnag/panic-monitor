@@ -123,9 +123,7 @@ def validate_stacktrace actual_stack, expected_stack
     if found < expected_len and frame["inProject"] and
         frame["file"] == expected_stack[found]["file"] and
         frame["method"] == expected_stack[found]["method"] and
-        (frame["lineNumber"] == expected_stack[found]["lineNumber"].to_i or
-         # leniency for line numbers for generated frames
-         frame["file"] == "_cgo_gotypes.go")
+        frame["lineNumber"] == expected_stack[found]["lineNumber"].to_i
       found = found + 1
     elsif found >= expected_len and frame["inProject"]
       found = found + 1 # detect excess frames without false negatives

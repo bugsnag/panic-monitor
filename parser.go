@@ -162,6 +162,11 @@ func parsePanicFrame(name string, line string, createdBy bool) (*e.StackFrame, e
 		return nil, fmt.Errorf("panic-monitor: Invalid line (no line number): %s", line)
 	}
 	file := line[1:idx]
+	// delineate generated files, using a separate package name to exclude from
+	// project packages (and in-project detection) by default
+	if isGeneratedFile(file) {
+		pkg = "<generated>." + pkg
+	}
 
 	number := line[idx+1:]
 	if idx = strings.Index(number, " +"); idx > -1 {
@@ -179,4 +184,12 @@ func parsePanicFrame(name string, line string, createdBy bool) (*e.StackFrame, e
 		Package:    pkg,
 		Name:       name,
 	}, nil
+}
+
+func isGeneratedFile(file string) bool {
+	// generated file patterns are documented in
+	// https://go.dev/src/cmd/cgo/doc.go
+	return strings.HasPrefix(file, "_cgo_") ||
+		strings.HasSuffix(file, "cgo1.go") ||
+		strings.HasSuffix(file, "cgo2.c")
 }

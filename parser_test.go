@@ -345,7 +345,7 @@ func TestParseSignal(t *testing.T) {
 
 	var result = []e.StackFrame{
 		{File: "/usr/local/Cellar/go/1.17.1/libexec/src/runtime/cgocall.go", LineNumber: 156, Name: "cgocall", Package: "runtime"},
-		{File: "_cgo_gotypes.go", LineNumber: 40, Name: "_Cfunc_testSig", Package: "main"},
+		{File: "_cgo_gotypes.go", LineNumber: 40, Name: "_Cfunc_testSig", Package: "<generated>.main"},
 		{File: "/Users/bugsnag/develop/cgo_segfault/main.go", LineNumber: 9, Name: "main", Package: "main"},
 		{File: "/usr/local/Cellar/go/1.17.1/libexec/src/runtime/proc.go", LineNumber: 255, Name: "main", Package: "runtime"},
 		{File: "/usr/local/Cellar/go/1.17.1/libexec/src/runtime/asm_amd64.s", LineNumber: 1581, Name: "goexit", Package: "runtime"},
