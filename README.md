@@ -6,7 +6,7 @@ a go panic, it is automatically reported to Bugsnag.
 ## Installation
 
 ```sh
-go install github.com/bugsnag/panic-monitor
+go install github.com/bugsnag/panic-monitor@latest
 ```
 
 ## Usage
