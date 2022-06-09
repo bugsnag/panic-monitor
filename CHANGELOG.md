@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.1.0 (TBD)
+## 1.1.0 (2022-06-09)
 
 ### Enhancements
 
