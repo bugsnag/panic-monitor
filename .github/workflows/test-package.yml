@@ -13,7 +13,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu, windows]
-        go-version: ['1.11', '1.12', '1.13', '1.14', '1.15']
+        go-version: ['1.11', '1.12', '1.13', '1.14', '1.15', '1.16', '1.17', '1.18']
 
     steps:
     - uses: actions/checkout@v2
@@ -30,6 +30,13 @@ jobs:
     - uses: actions/setup-go@v2
       with:
         go-version: ${{ matrix.go-version }}
+      # we don't want to hard pin a bugsnag-go version in release builds
+    - name: create dev module
+      env:
+        GO111MODULE: on # for go1.13 and below
+      run: |
+        go mod init
+        go mod tidy
     - name: install dependencies
       run: go get -v -d ./...
     - name: run unit tests
@@ -41,10 +48,9 @@ jobs:
       uses: ruby/setup-ruby@v1
       with:
         ruby-version: '2.6'
-        bundler-cache: true
     - name: install integration dependencies
       run: |
-        bundle config path vendor/bundle
+        bundle config path rubydeps/bundle
         bundle install --jobs 4 --retry 3 --quiet
     - name: run integration tests
       run: bundle exec cucumber --color

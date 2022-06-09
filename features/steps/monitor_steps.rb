@@ -84,6 +84,13 @@ Then(/^I receive an error event matching (.*)$/) do |filename|
   actual["events"][0]["device"].delete("hostname")
   actual["events"][0]["device"].delete("osName")
   actual["notifier"].delete("version")
+  metadata = actual["events"][0]["metaData"]
+  if metadata and metadata.has_key? "signal"
+    expect(metadata["signal"]["addr"]).to match /^0x[0-9a-f]+$/
+    expect(metadata["signal"]["code"]).to match /^0x[0-9a-f]+$/
+    expect(metadata["signal"]["pc"]).to match /^0x[0-9a-f]+$/
+    metadata.delete("signal")
+  end
 
   # Separate stacktrace for more complex testing
   actual_stack = actual["events"][0]["exceptions"][0].delete("stacktrace")

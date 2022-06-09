@@ -25,5 +25,7 @@ func main() {
 		badSwap(0, "boo")
 	case "goroutine":
 		panicInAGoroutine()
+	case "segfault":
+		doSegfault()
 	}
 }

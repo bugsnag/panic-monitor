@@ -22,6 +22,18 @@ Feature: Reporting fatal panics
             | nil pointer deref     | runtime error: invalid memory address or nil pointer dereference | nil-pointer.json    |
             | bad reflect swap      | panic: reflect: call of Swapper on string Value                  | reflect-swap.json   |
 
+    @posix
+    Scenario Outline: POSIX signal crashes
+        When I crash the app using <case>
+        Then the monitor process exited with an error
+        And 1 request was received
+        And "<message>" was printed to stderr
+        And I receive an error event matching <fixture>
+
+        Examples:
+            | case     | message                                                 | fixture       |
+            | segfault | fatal error: unexpected signal during runtime execution | segfault.json |
+
     Scenario: Avoid double-reporting panics
         When I crash the bugsnag-app using explicit panic
         And I wait for 2 seconds

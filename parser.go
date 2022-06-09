@@ -2,12 +2,15 @@ package main
 
 import (
 	"fmt"
+	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/bugsnag/bugsnag-go/v2"
 	e "github.com/bugsnag/bugsnag-go/v2/errors"
 )
 
-var panicHeaders = [][]byte {
+var panicHeaders = [][]byte{
 	[]byte("panic:"),
 	[]byte("fatal error:"),
 }
@@ -30,7 +33,7 @@ func (p uncaughtPanic) StackFrames() []e.StackFrame {
 	return p.frames
 }
 
-func parsePanic(text string) (*uncaughtPanic, error) {
+func parsePanic(text string) (*uncaughtPanic, *bugsnag.MetaData, error) {
 	lines := strings.Split(text, "\n")
 	prefixes := []string{"panic:", "fatal error:"}
 
@@ -39,6 +42,7 @@ func parsePanic(text string) (*uncaughtPanic, error) {
 	var message string
 	var typeName string
 	var stack []e.StackFrame
+	var metadata *bugsnag.MetaData
 
 	for i := 0; i < len(lines); i++ {
 		line := lines[i]
@@ -47,17 +51,44 @@ func parsePanic(text string) (*uncaughtPanic, error) {
 			for _, prefix := range prefixes {
 				if strings.HasPrefix(line, prefix) {
 					message = strings.TrimSpace(strings.TrimPrefix(line, prefix))
-					typeName = prefix[:len(prefix) - 1]
+					typeName = prefix[:len(prefix)-1]
+					// If this was a signal, look for more signal details on the next line
+					if strings.Contains(message, "signal") {
+						state = "signal"
+						break
+					}
 					state = "seek"
 					break
 				}
 			}
 			if state == "start" {
-				return nil, fmt.Errorf("panic-monitor: Invalid line (no prefix): %s", line)
+				return nil, nil, fmt.Errorf("panic-monitor: Invalid line (no prefix): %s", line)
 			}
 
+		} else if state == "signal" {
+			// Capture signal details if present and store in metadata
+			var re = regexp.MustCompile(`\[signal (?P<signal>[A-Z]+?): (?P<desc>.*?) code=(?P<code>[0-9xa-f]+?) addr=(?P<addr>[0-9xa-f]+?) pc=(?P<pc>[0-9xa-f]+?)\]`)
+
+			fields := re.FindStringSubmatch(line)
+			if fields != nil {
+				// Note: we only add metadata here ATM. If more Metadata will be added elsewhere, then we need better initialization
+				typeName = fields[1]
+				message = fields[2]
+				metadata = &bugsnag.MetaData{
+					"signal": {
+						"code": fields[3],
+						"addr": fields[4],
+						"pc":   fields[5],
+					},
+				}
+			}
+
+			// Whether or not we found signal details, start seeking
+			state = "seek"
+
 		} else if state == "seek" {
-			if strings.HasPrefix(line, "goroutine ") && strings.HasSuffix(line, "[running]:") {
+			if strings.HasPrefix(line, "goroutine ") &&
+				strings.HasSuffix(line, "[running]:") || strings.HasSuffix(line, "[syscall]:") {
 				state = "parsing"
 			}
 
@@ -75,12 +106,12 @@ func parsePanic(text string) (*uncaughtPanic, error) {
 			i++
 
 			if i >= len(lines) {
-				return nil, fmt.Errorf("panic-monitor: Invalid line (unpaired): '%s'", line)
+				return nil, nil, fmt.Errorf("panic-monitor: Invalid line (unpaired): '%s'", line)
 			}
 
 			frame, err := parsePanicFrame(line, lines[i], createdBy)
 			if err != nil {
-				return nil, err
+				return nil, nil, err
 			}
 
 			stack = append(stack, *frame)
@@ -92,9 +123,9 @@ func parsePanic(text string) (*uncaughtPanic, error) {
 	}
 
 	if state == "done" || state == "parsing" {
-		return &uncaughtPanic{typeName, message, stack}, nil
+		return &uncaughtPanic{typeName, message, stack}, metadata, nil
 	}
-	return nil, fmt.Errorf("panic-monitor: could not parse panic: %v", text)
+	return nil, nil, fmt.Errorf("panic-monitor: could not parse panic: %v", text)
 }
 
 // The lines we're passing look like this:
@@ -131,6 +162,11 @@ func parsePanicFrame(name string, line string, createdBy bool) (*e.StackFrame, e
 		return nil, fmt.Errorf("panic-monitor: Invalid line (no line number): %s", line)
 	}
 	file := line[1:idx]
+	// delineate generated files, using a separate package name to exclude from
+	// project packages (and in-project detection) by default
+	if isGeneratedFile(file) {
+		pkg = "<generated>." + pkg
+	}
 
 	number := line[idx+1:]
 	if idx = strings.Index(number, " +"); idx > -1 {
@@ -148,4 +184,12 @@ func parsePanicFrame(name string, line string, createdBy bool) (*e.StackFrame, e
 		Package:    pkg,
 		Name:       name,
 	}, nil
+}
+
+func isGeneratedFile(file string) bool {
+	// generated file patterns are documented in
+	// https://go.dev/src/cmd/cgo/doc.go
+	return strings.HasPrefix(file, "_cgo_") ||
+		strings.HasSuffix(file, "cgo1.go") ||
+		strings.HasSuffix(file, "cgo2.c")
 }

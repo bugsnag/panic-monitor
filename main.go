@@ -11,7 +11,7 @@ import (
 
 const (
 	Version = "1.0.0"
-	Usage = `%[1]s: A Go program launcher which automatically reports panics
+	Usage   = `%[1]s: A Go program launcher which automatically reports panics
 
 Usage:
 
@@ -70,7 +70,7 @@ Metadata:
 )
 
 var (
-	version = flag.Bool("version", false, "The version of panic-monitor")
+	version                      = flag.Bool("version", false, "The version of panic-monitor")
 	APIKeyMatcher *regexp.Regexp = regexp.MustCompile("^[0-9a-fA-f]{32}$")
 )
 
@@ -99,16 +99,19 @@ func main() {
 		os.Exit(1)
 	}
 
-	event, detectionErr := reader.detectedPanic()
+	event, metadata, detectionErr := reader.detectedPanic()
 	if detectionErr != nil && debugModeEnabled() {
 		printErr("%v", detectionErr)
 	}
 	if event != nil {
+		if metadata == nil {
+			metadata = &bugsnag.MetaData{}
+		}
 		bugsnag.Notify(event, bugsnag.HandledState{
 			SeverityReason:   bugsnag.SeverityReasonUnhandledPanic,
 			OriginalSeverity: bugsnag.SeverityError,
 			Unhandled:        true,
-		}, bugsnag.ErrorClass{Name: event.typeName})
+		}, bugsnag.ErrorClass{Name: event.typeName}, *metadata)
 	}
 
 	os.Exit(reader.exitCode)
