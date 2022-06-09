@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.0 (TBD)
+
+### Enhancements
+
+* Detect and report panics from crashes in Cgo pseudo-packages
+
 ## 1.0.1 (2021-01-29)
 
 ### Bug fixes
