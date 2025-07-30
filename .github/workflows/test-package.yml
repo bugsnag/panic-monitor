@@ -45,7 +45,9 @@ jobs:
     - name: set up ruby (for integration env)
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: '2.6'
+        ruby-version: '3.2'
+        bundler-cache: true
+        working-directory: go/src/github.com/bugsnag/panic-monitor
     - name: install integration dependencies
       run: |
         bundle config path rubydeps/bundle
