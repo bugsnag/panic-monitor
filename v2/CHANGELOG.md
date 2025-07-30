@@ -4,7 +4,7 @@
 
 ### Enhancements
 
-* Add go.mod to lock bugsnag-go notifier version, separated to v2 [#xx]()
+* Add go.mod to lock bugsnag-go notifier version, separated to v2 [#6](https://github.com/bugsnag/panic-monitor/pull/6)
 
 ## 1.1.0 (2022-06-09)
 
