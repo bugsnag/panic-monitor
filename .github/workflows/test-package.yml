@@ -30,7 +30,7 @@ jobs:
     - name: set GO111MODULE
       run: |
         bash -c 'echo "GO111MODULE=on" >> $GITHUB_ENV'
-    - uses: actions/setup-go@v2
+    - uses: actions/setup-go@v4
       with:
         go-version: ${{ matrix.go-version }}
     - name: install dependencies
