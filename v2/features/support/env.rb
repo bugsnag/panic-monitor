@@ -21,7 +21,7 @@ end
 
 # Build executables for the tests
 Dir.chdir(BUILD_DIR) do
-  `go build ..`
+  `go build -mod=mod ..`
   raise "Failed to build monitor" unless File.exist? executable("panic-monitor")
   `go build ../features/fixtures/app`
   raise "Failed to build sample app" unless File.exist? executable("app")
