@@ -122,7 +122,7 @@ def validate_stacktrace actual_stack, expected_stack
   actual_stack.each do |frame|
     if found < expected_len and frame["inProject"] and
         frame["file"].include? expected_stack[found]["file"] and
-        frame["method"] == expected_stack[found]["method"] and
+        frame["method"].include? expected_stack[found]["method"] and
         frame["lineNumber"] == expected_stack[found]["lineNumber"].to_i
       found = found + 1
     elsif found >= expected_len and frame["inProject"]

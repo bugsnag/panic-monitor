@@ -27,9 +27,10 @@ jobs:
       if: matrix.os == 'windows'
       run: |
         bash -c 'echo "GOPATH=$GITHUB_WORKSPACE\\\\go" >> $GITHUB_ENV'
-    - name: set GO111MODULE
+    - name: set GO111MODULE and CGO_ENABLED
       run: |
         bash -c 'echo "GO111MODULE=on" >> $GITHUB_ENV'
+        bash -c 'echo "CGO_ENABLED=1" >> $GITHUB_ENV'
     - uses: actions/setup-go@v4
       with:
         go-version: ${{ matrix.go-version }}
