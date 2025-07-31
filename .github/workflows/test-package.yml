@@ -1,6 +1,6 @@
 name: Test
 
-on: [ push, pull_request ]
+on: [ pull_request ]
 
 jobs:
   test:
@@ -13,7 +13,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu, windows]
-        go-version: ['1.11', '1.12', '1.13', '1.14', '1.15', '1.16', '1.17', '1.18']
+        go-version: ['1.12', '1.13', '1.14', '1.15', '1.16', '1.17', '1.18', '1.19', '1.20', '1.21', '1.22', '1.23', '1.24']
 
     steps:
     - uses: actions/checkout@v2
@@ -45,8 +45,7 @@ jobs:
     - name: set up ruby (for integration env)
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: '3.2'
-        bundler-cache: true
+        ruby-version: '2.6'
         working-directory: go/src/github.com/bugsnag/panic-monitor/v2
     - name: install integration dependencies
       working-directory: go/src/github.com/bugsnag/panic-monitor/v2
