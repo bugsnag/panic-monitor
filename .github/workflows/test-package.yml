@@ -46,14 +46,14 @@ jobs:
       uses: ruby/setup-ruby@v1
       with:
         ruby-version: '2.6'
-        working-directory: go/src/github.com/bugsnag/panic-monitor/v2
+        working-directory: go/src/github.com/bugsnag/panic-monitor
     - name: install integration dependencies
-      working-directory: go/src/github.com/bugsnag/panic-monitor/v2
+      working-directory: go/src/github.com/bugsnag/panic-monitor
       run: |
         bundle config path rubydeps/bundle
         bundle install --jobs 4 --retry 3 --quiet
     - name: run integration tests
-      working-directory: go/src/github.com/bugsnag/panic-monitor/v2
+      working-directory: go/src/github.com/bugsnag/panic-monitor
       run: bundle exec cucumber --color
 
 

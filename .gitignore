@@ -1,6 +1,12 @@
 # Ignore generated executable
 panic-monitor
+v2/panic-monitor
 
 # Avoid hard version requirement for bugsnag-go
 ./go.mod
 ./go.sum
+
+Gemfile.lock
+
+build/
+vendor/
