@@ -23,7 +23,7 @@ Feature: Configuring Bugsnag
             | BUGSNAG_METADATA_Carrot               | orange     | metaData.custom.Carrot        |
 
     Scenario: Configuring project packages
-        When I set "BUGSNAG_PROJECT_PACKAGES" to "main,github.com/bugsnag/panic-monitor/features/fixtures/app" in the environment
+        When I set "BUGSNAG_PROJECT_PACKAGES" to "main,github.com/bugsnag/panic-monitor/v2/features/fixtures/app" in the environment
         And I crash the app using explicit panic
         Then the monitor process exited with an error
         And 1 request was received

@@ -8,6 +8,7 @@ VERBOSE = ENV['VERBOSE'] || ARGV.include?('--verbose')
 GO_VERSION =`go version`.split[2]
 
 FileUtils.mkdir_p BUILD_DIR
+`go mod vendor`
 
 # Binary name for test apps
 def executable name
@@ -22,11 +23,11 @@ end
 # Build executables for the tests
 Dir.chdir(BUILD_DIR) do
   `go build ..`
-  raise "Failed to build monitor" unless File.exists? executable("panic-monitor")
+  raise "Failed to build monitor" unless File.exist? executable("panic-monitor")
   `go build ../features/fixtures/app`
-  raise "Failed to build sample app" unless File.exists? executable("app")
+  raise "Failed to build sample app" unless File.exist? executable("app")
   `go build ../features/fixtures/bugsnag-app`
-  raise "Failed to build sample app with bugsnag" unless File.exists? executable("bugsnag-app")
+  raise "Failed to build sample app with bugsnag" unless File.exist? executable("bugsnag-app")
 end
 
 Before do |scenario|

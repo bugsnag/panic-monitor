@@ -1,6 +1,6 @@
 name: Test
 
-on: [ push, pull_request ]
+on: [ pull_request ]
 
 jobs:
   test:
@@ -8,12 +8,12 @@ jobs:
     runs-on: ${{ matrix.os }}-latest
     defaults:
       run:
-        working-directory: 'go/src/github.com/bugsnag/panic-monitor' # relative to $GITHUB_WORKSPACE
+        working-directory: 'go/src/github.com/bugsnag/panic-monitor/v2' # relative to $GITHUB_WORKSPACE
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu, windows]
-        go-version: ['1.11', '1.12', '1.13', '1.14', '1.15', '1.16', '1.17', '1.18']
+        go-version: ['1.12', '1.13', '1.14', '1.15', '1.16', '1.17', '1.18', '1.19', '1.20', '1.21', '1.22', '1.23', '1.24']
 
     steps:
     - uses: actions/checkout@v2
@@ -27,32 +27,33 @@ jobs:
       if: matrix.os == 'windows'
       run: |
         bash -c 'echo "GOPATH=$GITHUB_WORKSPACE\\\\go" >> $GITHUB_ENV'
-    - uses: actions/setup-go@v2
+    - name: set GO111MODULE and CGO_ENABLED
+      run: |
+        bash -c 'echo "GO111MODULE=on" >> $GITHUB_ENV'
+    - uses: actions/setup-go@v4
       with:
         go-version: ${{ matrix.go-version }}
-      # we don't want to hard pin a bugsnag-go version in release builds
-    - name: create dev module
-      env:
-        GO111MODULE: on # for go1.13 and below
-      run: |
-        go mod init
-        go mod tidy
     - name: install dependencies
       run: go get -v -d ./...
-    - name: run unit tests
-      run: go test -v ./...
+    - name: run tests
+      run: go test $(go list ./... | grep -v /features/)
     - name: vet package
-      run: go vet ./...
+      # go1.12 vet shows spurious 'unknown identifier' issues
+      if: matrix.go-version != '1.12'
+      run: go vet $(go list ./... | grep -v /features/)
 
     - name: set up ruby (for integration env)
       uses: ruby/setup-ruby@v1
       with:
         ruby-version: '2.6'
+        working-directory: go/src/github.com/bugsnag/panic-monitor/v2
     - name: install integration dependencies
+      working-directory: go/src/github.com/bugsnag/panic-monitor/v2
       run: |
         bundle config path rubydeps/bundle
         bundle install --jobs 4 --retry 3 --quiet
     - name: run integration tests
+      working-directory: go/src/github.com/bugsnag/panic-monitor/v2
       run: bundle exec cucumber --color
 
 

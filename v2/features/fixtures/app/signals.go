@@ -6,4 +6,3 @@ import "C"
 func doSegfault() {
 	C.raise(11) // SIGSEGV
 }
-
